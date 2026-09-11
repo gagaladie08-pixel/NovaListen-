@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- app/src/main/AndroidManifest.xml -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- ══════════════════════════════════════════════════════════════
+         PERMISSIONS — Détection musicale
+         ════════════════════════════════════════════════════════════ -->
+
+    <!-- Écoute des notifications (MediaSession + Notification Listener) -->
+    <!-- L'utilisateur doit l'activer manuellement dans les paramètres  -->
+    <uses-permission android:name="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+        tools:ignore="ProtectedPermissions" />
+
+    <!-- Service en premier plan (détection musicale en arrière-plan) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
+    <!-- Redémarrage automatique après reboot -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Réseau (APIs externes) -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- WorkManager (sync périodique) -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:name=".NovaListenApp"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.NovaListen">
+
+        <!-- ══════════════════════════════════════════════════════════
+             ACTIVITÉ PRINCIPALE
+             ════════════════════════════════════════════════════════ -->
+        <activity
+            android:name=".presentation.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.NovaListen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Deep link pour callback Spotify OAuth PKCE -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="novalisten" android:host="callback" />
+            </intent-filter>
+        </activity>
+
+        <!-- ══════════════════════════════════════════════════════════
+             SERVICE DE DÉTECTION MUSICALE
+             ════════════════════════════════════════════════════════ -->
+        <service
+            android:name=".service.detection.DetectionService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!-- NotificationListenerService (accès aux notifications de toutes les apps) -->
+        <service
+            android:name=".service.detection.NovaListenNotificationListener"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- Receiver pour redémarrage après reboot -->
+        <receiver
+            android:name=".service.detection.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+
+</manifest>

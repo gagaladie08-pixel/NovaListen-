@@ -1,0 +1,20 @@
+# ── Local secrets (JAMAIS sur Git) ─────────────────────────────────────
+local.properties
+secrets.properties
+*.keystore
+*.jks
+google-services.json
+
+# ── Build ───────────────────────────────────────────────────────────────
+/build
+/app/build
+.gradle
+
+# ── IDE ─────────────────────────────────────────────────────────────────
+.idea/
+*.iml
+.DS_Store
+
+# ── Android ─────────────────────────────────────────────────────────────
+/captures
+/app/release
