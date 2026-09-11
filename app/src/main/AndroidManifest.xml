@@ -2,12 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Détection musicale -->
+    <!-- ══ Permissions ══════════════════════════════════════════════════ -->
+
+    <!-- Détection musicale (MediaSession + Notifications) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <!-- Réseau -->
+    <!-- Réseau (APIs externes) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -27,7 +29,7 @@
         android:theme="@style/Theme.NovaListen"
         tools:targetApi="31">
 
-        <!-- Activité principale -->
+        <!-- ══ Activité principale ══════════════════════════════════════ -->
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
@@ -36,17 +38,41 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-            <!-- Deep link Spotify OAuth PKCE -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:host="callback"
-                    android:scheme="novalisten" />
+                <data android:scheme="novalisten" android:host="callback" />
             </intent-filter>
         </activity>
+
+        <!-- ══ Service de détection musicale ════════════════════════════ -->
+        <service
+            android:name=".service.detection.DetectionService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!-- ══ NotificationListenerService ══════════════════════════════ -->
+        <service
+            android:name=".service.detection.NovaListenNotificationListener"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission=
+                "android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name=
+                    "android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- ══ BootReceiver ══════════════════════════════════════════════ -->
+        <receiver
+            android:name=".service.detection.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
