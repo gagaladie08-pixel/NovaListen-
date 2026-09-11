@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 // Fonction pour lire local.properties sans exposer les clés
@@ -31,7 +32,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Clés API injectées depuis local.properties (JAMAIS dans le code)
         buildConfigField("String", "SPOTIFY_CLIENT_ID",    "\"${getLocalProperty("SPOTIFY_CLIENT_ID")}\"")
         buildConfigField("String", "LASTFM_API_KEY",       "\"${getLocalProperty("LASTFM_API_KEY")}\"")
         buildConfigField("String", "FANART_API_KEY",       "\"${getLocalProperty("FANART_API_KEY")}\"")
@@ -59,7 +59,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    // ✅ CORRECTION : compilerOptions remplace kotlinOptions (déprécié)
     kotlin {
         compilerOptions {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
@@ -69,6 +68,11 @@ android {
     buildFeatures {
         compose     = true
         buildConfig = true
+    }
+
+    // ✅ Room schema export
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 }
 
